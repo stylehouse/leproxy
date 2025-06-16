@@ -1,0 +1,31 @@
+services:
+  ssh-tunnel-destiny:
+    # doesn't know anything about the ports its going to forward, see ssh-tunnel-source
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM alpine:3.19
+        RUN apk add --no-cache \
+            openssh-server \
+            curl \
+            bind-tools \
+            iputils \
+            iproute2 && \
+            mkdir /run/sshd && \
+            mkdir -p /root/.ssh
+        RUN ssh-keygen -A
+        COPY env_to_authorized_keys.sh /root/
+        RUN chmod +x /root/env_to_authorized_keys.sh
+        RUN sed -i '/^AllowTcpForwarding no/d; /^GatewayPorts no/d' /etc/ssh/sshd_config && \
+            echo "AllowTcpForwarding yes" >> /etc/ssh/sshd_config && \
+            echo "GatewayPorts yes" >> /etc/ssh/sshd_config && \
+            echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+          # < these seem not to work, though sshd -d -e ... did (but very noisy)
+          # echo "LogLevel VERBOSE" >> /etc/ssh/sshd_config && \
+          # echo "SyslogFacility AUTH" >> /etc/ssh/sshd_config
+        CMD ["/bin/sh", "-c", "/root/env_to_authorized_keys.sh && /usr/sbin/sshd -D -p 2029"]
+    environment:
+      - SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY}
+    ports:
+      - "2029:2029"
+    restart: always

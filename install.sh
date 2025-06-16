@@ -11,9 +11,9 @@ echo -e "${GREEN}🎵 installing leproxy - duckdns reverse proxy hosting ${NC}\n
 # Source existing .env if it exists
 [[ -f .env ]] && source .env
 
-# Get DuckDNS domain and token
+# for DuckDNS domain management
 echo -e "\n${GREEN}Setup DuckDNS configuration:${NC}"
-read -p "public ip (8.8.4.4): " -i "${PUBLIC_IP:-}" -e PUBLIC_IP
+read -p "public host ip (8.8.4.4): " -i "${PUBLIC_IP:-}" -e PUBLIC_IP
 read -p "subdomains (a,b,c): " -i "${DUCKDNS_NAMES:-}" -e DUCKDNS_NAMES
 read -p "their localhost ports (9090,9091,hostname:9090): " -i "${NAMES_PORTS:-}" -e NAMES_PORTS
 read -p "token: " -i "${DUCKDNS_TOKEN:-}" -e DUCKDNS_TOKEN
@@ -28,7 +28,6 @@ rm tunnel_key tunnel_key.pub
 
 read -p "are you sure? "
 
-# for DNS management
 cat > .env << EOF
 PUBLIC_IP=${PUBLIC_IP}
 DUCKDNS_NAMES=${DUCKDNS_NAMES}

@@ -28,7 +28,7 @@ services:
     # dont leave a failing update loop going
     restart: no
   
-  # 
+  # ssh -R connects their :80 and :443 to the Caddy service here
   ssh-tunnel-source:
     build:
       context: .
@@ -36,14 +36,12 @@ services:
         FROM alpine:3.19
         RUN apk add --no-cache openssh-client
         RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
-    
-    # the -R connects all their :443 to the Caddy server here
     command: |
       sh -c 'echo "$$SSH_PRIVATE_KEY" > /root/.ssh/id_ed25519 && \
       chmod 600 /root/.ssh/id_ed25519 && \
       exec ssh -v -N \
-        -R 0.0.0.0:80:caddy:2080 \
-        -R 0.0.0.0:443:caddy:2443 \
+        -R 0.0.0.0:80:caddy:80 \
+        -R 0.0.0.0:443:caddy:443 \
         -i /root/.ssh/id_ed25519 \
         -o ServerAliveInterval=30 \
         -o ExitOnForwardFailure=yes \
@@ -62,9 +60,11 @@ services:
   #  not building modules for duckdns saves a bit of time here
   caddy:
     image: caddy:2
-    ports:
-      - "2080:80"
-      - "2443:443"
+    # doesn't expose the hosting to your local network
+    #  only way in is the proxy with a domain name
+    # ports:
+    #   - "2080:80"
+    #   - "2443:443"
     volumes:
       - caddy_data:/data
       - caddy_config:/config

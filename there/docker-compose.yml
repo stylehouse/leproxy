@@ -28,4 +28,6 @@ services:
       - SSH_PUBLIC_KEY=${SSH_PUBLIC_KEY}
     ports:
       - "2029:2029"
+      - "80:80"
+      - "443:443"
     restart: always

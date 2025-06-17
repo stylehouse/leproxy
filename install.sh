@@ -12,7 +12,7 @@ echo -e "${GREEN}🎵 installing leproxy - duckdns reverse proxy hosting ${NC}\n
 [[ -f .env ]] && source .env
 
 # for DuckDNS domain management
-echo -e "\n${GREEN}Setup DuckDNS configuration:${NC}"
+echo -e "\n${GREEN}Setup DuckDNS configuration - see https://www.duckdns.org/domains${NC}"
 echo "  for ipv6, append or only enter: &ipv6=1234::5678"
 read -p "public host ip (8.8.4.4): " -i "${PUBLIC_IP:-}" -e PUBLIC_IP
 read -p "subdomains (a,b,c): " -i "${DUCKDNS_NAMES:-}" -e DUCKDNS_NAMES

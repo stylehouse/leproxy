@@ -86,11 +86,12 @@ configs:
     content: |
 
 
+# < 172.17.0.1 should be derived from `ip addr | grep docker0`?
 for $name (@names) {
     ($port,$host) = reverse split ':', shift @ports;
-    $host ||= 'localhost';
+    $host ||= '172.17.0.1';
     say " - handle $name -> $host:$port";
-    $host !~ /^\w+$/ and die "weird host: $host";
+    $host !~ /^[\w\.:]+$/ and die "weird host: $host";
     $port !~ /^\d+$/ and die "weird host: $port";
     print $fh <<"";
       $name.duckdns.org {

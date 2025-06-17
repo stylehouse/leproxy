@@ -5,6 +5,7 @@ update_dns() {
     IP=$PUBLIC_IP
     # < dynamic ip
     #(curl -s 'https://api.ipify.org?format=json' | jq -r '.ip')
+    # one may inject this url for ipv6, see install.sh
     RESPONSE=$(curl -s "https://www.duckdns.org/update?domains=${DUCKDNS_NAMES}&token=${DUCKDNS_TOKEN}&ip=${IP}")
     
     if [ "$RESPONSE" = "OK" ]; then

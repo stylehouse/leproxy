@@ -85,11 +85,14 @@ configs:
   caddy_config:
     content: |
 
+# all dockers on your machine can bind ports on the docker0 interface
+#  which is usually at this ip
+$docker0ip = '172.17.0.1';
 
-# < 172.17.0.1 should be derived from `ip addr | grep docker0`?
+# < $docker0ip should be derived from `ip addr | grep docker0`?
 for $name (@names) {
     ($port,$host) = reverse split ':', shift @ports;
-    $host ||= '172.17.0.1';
+    $host ||= $docker0ip;
     say " - handle $name -> $host:$port";
     $host !~ /^[\w\.:]+$/ and die "weird host: $host";
     $port !~ /^\d+$/ and die "weird host: $port";

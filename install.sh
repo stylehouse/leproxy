@@ -44,7 +44,7 @@ cat > there/.env << EOF
 SSH_PUBLIC_KEY="${PUBLIC_KEY}"
 EOF
 
-bash here/build-docker-compose.sh
+bash build-docker-compose.sh
 
 echo "Now: scp -r there/{.,}* d:leproxy"
 echo " if your docker hoster's hostname is 'd'."

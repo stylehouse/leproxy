@@ -95,9 +95,23 @@ for $name (@names) {
     say " - handle $name -> $host:$port";
     $host !~ /^[\w\.:]+$/ and die "weird host: $host";
     $port !~ /^\d+$/ and die "weird host: $port";
-    print $fh <<"";
+
+    $extra = "";
+    if ($name =~ /^d?(jam|vou)/) {
+        # share a WebRTC signaling server aft Caddy
+        $extra .= <<"";
+          handle_path /peerjs-server/* {
+              reverse_proxy $host:9995
+          }
+
+    }
+
+    print $fh <<""
       $name.duckdns.org {
           encode zstd gzip
+
+    . $extra
+    . <<"";
           handle {
               reverse_proxy $host:$port
           }

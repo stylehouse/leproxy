@@ -19,8 +19,7 @@ services:
         FROM alpine:3.19
         RUN apk add --no-cache curl
         COPY duckdns_update.sh /
-        RUN chmod +x /duckdns_update.sh
-        CMD ["./duckdns_update.sh"]
+        CMD ["ash","duckdns_update.sh"]
     environment:
       - PUBLIC_IP=${PUBLIC_IP}
       - DUCKDNS_NAMES=${DUCKDNS_NAMES}

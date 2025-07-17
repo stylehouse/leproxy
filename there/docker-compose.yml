@@ -1,6 +1,6 @@
 services:
+  # see ssh-tunnel-source
   ssh-tunnel-destiny:
-    # doesn't know anything about the ports its going to forward, see ssh-tunnel-source
     build:
       context: .
       dockerfile_inline: |

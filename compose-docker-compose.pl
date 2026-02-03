@@ -27,33 +27,33 @@ services:
     # dont leave a failing update loop going
     restart: no
   
-  # ssh -R connects their :80 and :443 to the Caddy service here
-  ssh-tunnel-source:
-    build:
-      context: .
-      dockerfile_inline: |
-        FROM alpine:3.19
-        RUN apk add --no-cache openssh-client
-        RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
-    command: |
-      sh -c 'echo "$$SSH_PRIVATE_KEY" > /root/.ssh/id_ed25519 && \
-      chmod 600 /root/.ssh/id_ed25519 && \
-      exec ssh -v -N \
-        -R 0.0.0.0:80:caddy:80 \
-        -R 0.0.0.0:443:caddy:443 \
-        -i /root/.ssh/id_ed25519 \
-        -o ServerAliveInterval=30 \
-        -o ExitOnForwardFailure=yes \
-        -o StrictHostKeyChecking=accept-new \
-        -p 2029 \
-        root@d'
-    environment:
-      - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY}
-    depends_on:
-      - caddy
-    networks:
-      - web
-    restart: always
+  # # ssh -R connects their :80 and :443 to the Caddy service here
+  # ssh-tunnel-source:
+  #   build:
+  #     context: .
+  #     dockerfile_inline: |
+  #       FROM alpine:3.19
+  #       RUN apk add --no-cache openssh-client
+  #       RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
+  #   command: |
+  #     sh -c 'echo "$$SSH_PRIVATE_KEY" > /root/.ssh/id_ed25519 && \
+  #     chmod 600 /root/.ssh/id_ed25519 && \
+  #     exec ssh -v -N \
+  #       -R 0.0.0.0:80:caddy:80 \
+  #       -R 0.0.0.0:443:caddy:443 \
+  #       -i /root/.ssh/id_ed25519 \
+  #       -o ServerAliveInterval=30 \
+  #       -o ExitOnForwardFailure=yes \
+  #       -o StrictHostKeyChecking=accept-new \
+  #       -p 2029 \
+  #       root@d'
+  #   environment:
+  #     - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY}
+  #   depends_on:
+  #     - caddy
+  #   networks:
+  #     - web
+  #   restart: always
   
   # this caddy uses HTTP/TLS challenges (requiring port 443 access)
   #  not building modules for duckdns saves a bit of time here
@@ -98,10 +98,21 @@ for $name (@names) {
 
     $extra = "";
     if ($name =~ /^d?(jam|vou)/) {
+        # these are extra ports we forward everything under a path (without the path) to
         # share a WebRTC signaling server aft Caddy
+        # handle_path implicitly strips the prefix. If you visit example.com/log, 
+        #  Caddy sends / to the Mojo server
         $extra .= <<"";
           handle_path /peerjs-server/* {
               reverse_proxy $host:9995
+          }
+          handle_path /log {
+              \@not_local not remote_ip 127.0.0.1 10.0.0.0/8 172.16.0.0/12
+              abort \@not_local
+              reverse_proxy $host:9393 {
+                header_up Host {host}
+                header_up X-Real-IP {remote_host}
+              }
           }
 
     }

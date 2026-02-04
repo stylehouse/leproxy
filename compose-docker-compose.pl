@@ -124,8 +124,8 @@ for $name (@names) {
               reverse_proxy $host:9995
           }
           handle_path /log {
-              \@not_local not remote_ip 127.0.0.1 10.0.0.0/8 172.16.0.0/12 $local_includes
-              abort \@not_local
+              #\@not_local not remote_ip 127.0.0.1 10.0.0.0/8 172.16.0.0/12 $local_includes
+              #abort \@not_local
               reverse_proxy $host:9393 {
                 header_up Host {host}
                 header_up X-Real-IP {remote_host}

@@ -59,8 +59,15 @@ services:
   #  not building modules for duckdns saves a bit of time here
   caddy:
     image: caddy:2
-    # doesn't expose the hosting to your local network
-    #  only way in is the proxy with a domain name
+    ports:
+      - ":80"
+      - ":443"
+      - "192.168.1.11:9080:80"
+      - "192.168.1.11:9999:443"
+    
+    # GONE see ssh-tunnel-source, which:
+    #   doesn't expose the hosting to your local network
+    #    only way in is the proxy with a domain name
     # ports:
     #   - "2080:80"
     #   - "2443:443"
@@ -87,6 +94,16 @@ configs:
 # all dockers on your machine can bind ports on the docker0 interface
 #  which is usually at this ip
 $docker0ip = '172.17.0.1';
+ 
+# could include 192.168.0.0/16 here 
+#  to allow /log from other hosts on the LAN
+# they would need to resolve the domain to your LAN address
+#  which is what your appservers would do from other containers on the prod server.
+# hmm, I had to include this here...
+#  so:
+#   we're not passing public IPs to appservers
+$local_includes = '192.168.0.0/16';
+
 
 # < $docker0ip should be derived from `ip addr | grep docker0`?
 for $name (@names) {
@@ -107,7 +124,7 @@ for $name (@names) {
               reverse_proxy $host:9995
           }
           handle_path /log {
-              \@not_local not remote_ip 127.0.0.1 10.0.0.0/8 172.16.0.0/12
+              \@not_local not remote_ip 127.0.0.1 10.0.0.0/8 172.16.0.0/12 $local_includes
               abort \@not_local
               reverse_proxy $host:9393 {
                 header_up Host {host}

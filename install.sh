@@ -80,10 +80,11 @@ if [[ "${GENERATE_KEYS}" == true ]]; then
 else
     echo "Then here:"
     echo " docker compose up -d"
-    echo "By the way this:"
-    echo " docker logs leproxy-ssh-tunnel-source-1"
-    echo "Should say:"
-    echo " debug1: forwarding_success: all expected forwarding replies received"
+    # disabled the ssh tunnel feature for the mo
+    # echo "By the way this:"
+    # echo " docker logs leproxy-ssh-tunnel-source-1"
+    # echo "Should say:"
+    # echo " debug1: forwarding_success: all expected forwarding replies received"
     
 
 fi

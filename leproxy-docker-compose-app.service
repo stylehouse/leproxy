@@ -19,7 +19,8 @@ ExecStartPost=/bin/bash -c ' \
             echo "Port 9999 verified!"; exit 0; \
         fi; \
         echo "Port 9999 not found, restarting containers (Attempt $i)..."; \
-        /usr/bin/docker compose restart; \
+        /usr/bin/docker compose down; \
+        /usr/bin/docker compose up; \
         sleep 5; \
     done; \
     echo "Failed to bind port 9999 after 5 attempts"; exit 1'

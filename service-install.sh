@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVICE_NAME="leproxy-docker-compose-app.service"
+SERVICE_NAME="leproxy.service"
 SOURCE_PATH="./$SERVICE_NAME"
 DEST_PATH="/etc/systemd/system/$SERVICE_NAME"
 

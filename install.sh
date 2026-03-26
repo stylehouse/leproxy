@@ -17,7 +17,7 @@ echo -e "${GREEN}🎵 installing leproxy - duckdns reverse proxy hosting ${NC}\n
 echo -e "\n${GREEN}Setup DuckDNS configuration - see https://www.duckdns.org/domains${NC}"
 echo ""
 echo "  for ipv6, append or only enter: &ipv6=1234::5678"
-read -p "public host ip (eg 8.8.4.4): " -i "${PUBLIC_IP:-}" -e PUBLIC_IP
+read -p "public host ip (blank for auto): " -i "${PUBLIC_IP:-}" -e PUBLIC_IP
 # without .duckdns.org
 read -p "subdomains (eg a,b,c): " -i "${DUCKDNS_NAMES:-}" -e DUCKDNS_NAMES
 # port only if your service is on docker0

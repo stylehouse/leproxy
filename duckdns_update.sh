@@ -2,7 +2,7 @@
 set -euo pipefail
 
 update_dns() {
-    IP=$PUBLIC_IP
+    IP=${PUBLIC_IP:-}
     # < dynamic ip
     #(curl -s 'https://api.ipify.org?format=json' | jq -r '.ip')
     # one may inject this url for ipv6, see install.sh
@@ -19,8 +19,8 @@ update_dns() {
 # Initial update
 update_dns
 
-# Then update every 12 hours
+# Then update every 5 hours
 while true; do
-    sleep 43200  # 12 hours in seconds
+    sleep 18000
     update_dns
 done

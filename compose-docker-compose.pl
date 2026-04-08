@@ -58,7 +58,15 @@ services:
   # this caddy uses HTTP/TLS challenges (requiring port 443 access)
   #  not building modules for duckdns saves a bit of time here
   caddy:
-    image: caddy:2
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM caddy:2-builder AS builder
+        RUN xcaddy build --with github.com/caddy-dns/duckdns
+        FROM caddy:2
+        COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+    environment:
+      - DUCKDNS_TOKEN=${DUCKDNS_TOKEN}
     ports:
       - ":80"
       - ":443"
@@ -137,6 +145,9 @@ for $name (@names) {
     print $fh <<""
       $name.duckdns.org {
           encode zstd gzip
+          tls {
+              dns duckdns {env.DUCKDNS_TOKEN}
+          }
 
     . $extra
     . <<"";

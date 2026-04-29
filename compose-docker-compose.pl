@@ -52,6 +52,7 @@ if ($tunnel_mode) {
       exec ssh -v -N \
         -R 0.0.0.0:80:caddy:80 \
         -R 0.0.0.0:443:caddy:443 \
+        -R 0.0.0.0:9999:caddy:443 \
         -i /root/.ssh/id_ed25519 \
         jamsend-fe'
     environment:

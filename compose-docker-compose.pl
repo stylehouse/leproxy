@@ -83,8 +83,6 @@ print $fh <<'';
     ports:
       - ":80"
       - ":443"
-      - "192.168.1.11:9080:80"
-      - "192.168.1.11:9999:443"
     volumes:
       - caddy_data:/data
       - caddy_config:/config

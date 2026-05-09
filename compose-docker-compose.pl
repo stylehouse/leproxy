@@ -46,15 +46,27 @@ if ($tunnel_mode) {
         RUN apk add --no-cache openssh-client
         RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
     command: |
-      sh -c 'echo "$$SSH_PRIVATE_KEY" > /root/.ssh/id_ed25519 && \
-      chmod 600 /root/.ssh/id_ed25519 && \
-      cp /ssh_config /root/.ssh/config && \
-      exec ssh -v -N \
-        -R 0.0.0.0:80:caddy:80 \
-        -R 0.0.0.0:443:caddy:443 \
-        -R 0.0.0.0:9999:caddy:443 \
-        -i /root/.ssh/id_ed25519 \
-        jamsend-fe'
+        sh -c '
+          echo "$$SSH_PRIVATE_KEY" > /root/.ssh/id_ed25519 && \
+          chmod 600 /root/.ssh/id_ed25519 && \
+          cp /ssh_config /root/.ssh/config && \
+          ssh -i /root/.ssh/id_ed25519 jamsend-fe "
+            # reap orphaned sshd sessions holding our forward ports.
+            # PID 1 is the listener; \$$PPID is the sshd serving this very session.
+            for p in \$$(pidof sshd); do
+              case \"\$$p\" in 1|\$$PPID) ;; *) kill \"\$$p\" 2>/dev/null ;; esac
+            done
+            sleep 1
+          " || true; \
+          exec ssh -v -N \
+            -o ExitOnForwardFailure=yes \
+            -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=3 \
+            -R 0.0.0.0:80:caddy:80 \
+            -R 0.0.0.0:443:caddy:443 \
+            -R 0.0.0.0:9999:caddy:443 \
+            -i /root/.ssh/id_ed25519 \
+            jamsend-fe'
     environment:
       - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY}
     configs:
